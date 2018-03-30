@@ -5,9 +5,11 @@ namespace App\Models;
 use App\Traits\Uuids;
 use Illuminate\Database\Eloquent\Model;
 
-class Contact extends Model
+
+class RadiusConfirm extends Model
 {
     use Uuids;
+
     /**
      * Indicates if the IDs are auto-incrementing.
      *
@@ -21,7 +23,7 @@ class Contact extends Model
      * @var array
      */
     protected $fillable = [
-        'forename', 'surname', 'email', 'phone'
+        'hash', 'completed'
     ];
 
     /**
@@ -30,14 +32,14 @@ class Contact extends Model
      * @var array
      */
     protected $hidden = [
-
+        'id', 'hash', 'completed', 'user_id'
     ];
 
     /**
-     * Get the messages for the contact.
+     * Get the user that owns the confirmation.
      */
-    public function messages()
+    public function user()
     {
-        return $this->hasMany('App\Models\Message');
+        return $this->belongsTo('App\Models\RadiusUser', 'radius_user_id', 'id');
     }
 }

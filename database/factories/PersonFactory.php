@@ -1,9 +1,9 @@
 <?php
 
 use Faker\Generator as Faker;
-use App\Models\Contact;
+use App\Models\Person;
 
-$factory->define(Contact::class, function (Faker $faker) {
+$factory->define(Person::class, function (Faker $faker) {
     return [
         'forename' => $faker->firstName,
         'surname' => $faker->lastName,

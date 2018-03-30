@@ -8,6 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 class Message extends Model
 {
     use Uuids;
+
+    public $relationNames = [
+        'sender',
+        'receiver',
+        'senderClient',
+        'receiverClient'
+    ];
+
     /**
      * Indicates if the IDs are auto-incrementing.
      *
@@ -30,14 +38,59 @@ class Message extends Model
      * @var array
      */
     protected $hidden = [
-        'contact_id'
+        'sender_id',
+        'receiver_id',
+        'sender_client_id',
+        'receiver_client_id'
     ];
 
     /**
-     * Get the contact that owns the message.
+     * Get the person that sent the message.
      */
-    public function contact()
+    public function sender()
     {
-        return $this->belongsTo('App\Models\Contact');
+        return $this->belongsTo('App\Models\Person');
+    }
+
+    /**
+     * Get the person that received the message.
+     */
+    public function receiver()
+    {
+        return $this->belongsTo('App\Models\Person');
+    }
+
+    /**
+     * Get the client with which the message was sent.
+     */
+    public function senderClient()
+    {
+        return $this->belongsTo('App\Models\Client');
+    }
+
+    /**
+     * Get the client with which the message was received.
+     */
+    public function receiverClient()
+    {
+        return $this->belongsTo('App\Models\Client');
+    }
+
+    /**
+     * @return array
+     */
+    public function getRelationNames(): array
+    {
+        return $this->relationNames;
+    }
+
+    /**
+     * @param array $relationNames
+     * @return Message
+     */
+    public function setRelationNames(array $relationNames): Message
+    {
+        $this->relationNames = $relationNames;
+        return $this;
     }
 }
