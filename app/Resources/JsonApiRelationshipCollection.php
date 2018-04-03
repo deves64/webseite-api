@@ -11,11 +11,18 @@ class JsonApiRelationshipCollection extends ResourceCollection
      *
      * @param  \Illuminate\Http\Request
      *
-     * @return array
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
     public function toArray($request)
     {
-        return  JsonApiRelationshipResource::collection($this->collection);
+        $zeug = [];
+        foreach ($this->collection as $key => $value) {
+            $item = new JsonApiRelationshipResource($value);
+
+            $zeug[kebab_case($item->getRelationName())] = $item;
+        }
+
+        return  $zeug;
     }
 
     /**

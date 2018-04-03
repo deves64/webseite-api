@@ -6,10 +6,13 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Http\Resources\Json\Resource;
 
-class JsonApiRelationshipResource extends Resource implements JsonApiInterface
+class JsonApiRelationshipResource extends Resource implements JsonApiLinksInterface
 {
+    use JsonApiTrait;
     /**
      * Transform the resource into an array.
      *
@@ -20,58 +23,33 @@ class JsonApiRelationshipResource extends Resource implements JsonApiInterface
     {
         $relationName = $this->getRelationName();
         $parent = $this->getParent();
-        $resource = $parent->$relationName;
-
-        $relationship['data'] = get_class($resource);
+        $model = $parent->$relationName;
 
         $data = [];
 
-        if(get_parent_class
-            ($resource) === Model::class) {
-            $data = new JsonApiIdentifierResource($resource);
+        if(get_parent_class($model) === Model::class) {
+            $data = new JsonApiIdentifierResource($model);
         }
-        else if(get_class($resource) === Collection::class) {
-            $data = new JsonApiIdentifierCollection($resource);
+        else if(get_class($model) === Collection::class) {
+            $data = new JsonApiIdentifierCollection($model);
         }
+
+        $parent = $this->getParent();
 
         $relationship = [
-            kebab_case($relationName) => [
-                'links' => $this->getLinks(),
+                'links' => $this->getLinksFrom($parent),
                 'data'      => $data
-            ]
-        ];
-
+            ];
 
         return $relationship;
     }
 
-    public function getId()
-    {
-        $parent = $this->getParent();
-
-        return (string) array_only($parent->toArray(), ['id'])['id'];
-    }
-
-    public function getType()
-    {
-        $resource = $this->resource;
-
-        return strtolower(class_basename(get_class($resource)));
-    }
-
-    public function getLinks()
+    public function getLinksFrom(Model $model)
     {
         return [
-            'self'    => route($this->getParentType() . ucfirst($this->getRelationName())  . 'Relationship.show', ['id' => $this->getId()]),
-            'related' => route($this->getParentType() . ucfirst($this->getRelationName())  . 'Child.show', ['id' => $this->getId()]),
+            'self'    => route($this->getTypeFrom($model) . ucfirst($this->getRelationName())  . 'Relationship.show', ['id' => $this->getIdFrom($model)]),
+            'related' => route($this->getTypeFrom($model) . ucfirst($this->getRelationName())  . 'Child.show', ['id' => $this->getIdFrom($model)]),
         ];
-    }
-
-    protected function getParentType()
-    {
-        $parent = $this->getParent();
-
-        return strtolower(class_basename(get_class($parent)));
     }
 
     public function getParent()
@@ -83,8 +61,9 @@ class JsonApiRelationshipResource extends Resource implements JsonApiInterface
             case BelongsToMany::class:
                     $parent = $this->resource->getParent();
                 break;
-            case 'Illuminate\\Database\\Eloquent\\Model':
-
+            case HasOne::class:
+            case HasMany::class:
+                    $parent = $this->resource->getParent();
                 break;
             default:
 
@@ -103,7 +82,8 @@ class JsonApiRelationshipResource extends Resource implements JsonApiInterface
             case BelongsToMany::class:
                     $relationName = $this->resource->getRelation();
                 break;
-            case 'Illuminate\\Database\\Eloquent\\Model':
+            case HasOne::class:
+            case HasMany::class:
 
                 break;
             default:

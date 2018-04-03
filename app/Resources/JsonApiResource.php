@@ -2,12 +2,14 @@
 
 namespace App\Resources;
 
+use App\Models\RelationNamesInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Resources\Json\Resource;
 use Illuminate\Support\Collection;
 
-class JsonApiResource extends Resource implements JsonApiInterface
+class JsonApiResource extends Resource implements JsonApiLinksInterface
 {
+    use JsonApiTrait;
     /**
      * Create a new resource instance.
      *
@@ -27,54 +29,46 @@ class JsonApiResource extends Resource implements JsonApiInterface
      */
     public function toArray($request)
     {
+        $model = $this->resource;
+
         $resource = [
-            'type'       => $this->getType(),
-            'id'         => $this->getId(),
-            'attributes' => $this->getAttributes(),
+            'type'       => $this->getTypeFrom($model),
+            'id'         => $this->getIdFrom($model),
+            'attributes' => $this->getAttributesFrom($model),
         ];
 
-        if($relationships = $this->getRelationsShips()) {
+        if($relationships = $this->getRelationsShipsFrom($model)) {
             $resource['relationships'] = $relationships;
         }
 
-        $resource['links'] = $this->getLinks();
+        $resource['links'] = $this->getLinksFrom($model);
 
         return $resource;
     }
 
-    public function getId()
+    public function getLinksFrom(Model $model)
     {
-        return $this->resource->getKey();
+        return ['self' => route($this->getTypeFrom($model) . '.show', ['id' => $this->getIdFrom($model)])];
     }
 
-    public function getType(Model $model)
+    public function getAttributesFrom(Model $model)
     {
-        return strtolower(class_basename(get_class($model)));
+        return array_except($model->attributesToArray(), ['id']);
     }
 
-    public function getLinks()
+    public function getRelationsShipsFrom(RelationNamesInterface $model)
     {
-        return ['self' => route($this->getType() . '.show', ['id' => $this->getId()])];
-    }
-
-    public function getAttributes()
-    {
-        return array_except($this->resource->attributesToArray(), ['id']);
-    }
-
-    public function getRelationsShips()
-    {
-        if(empty($this->resource->getRelationNames())) {
+        if(empty($model->getRelationNames())) {
             return false;
         }
 
-        $relationNames = $this->resource->getRelationNames();
+        $relationNames = $model->getRelationNames();
 
         if(! is_array($relationNames)) {
             return false;
         }
 
-        $relationObjects = $this->getRelationObjectsFromModel($this->resource);
+        $relationObjects = $this->getRelationObjectsFromModel($model);
 
         if(count($relationNames) > 1) {
             $relationsShips = new JsonApiRelationshipCollection($relationObjects);
@@ -86,7 +80,7 @@ class JsonApiResource extends Resource implements JsonApiInterface
         return $relationsShips;
     }
 
-    public function getRelationObjectsFromModel(Model $model)
+    public function getRelationObjectsFromModel(RelationNamesInterface $model)
     {
         $relationNames = $model->getRelationNames();
         $relationObjects = [];
@@ -113,5 +107,4 @@ class JsonApiResource extends Resource implements JsonApiInterface
     {
         $response->header('Content-Type', 'application/vnd.api+json');
     }
-
 }

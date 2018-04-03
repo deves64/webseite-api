@@ -5,7 +5,7 @@ namespace App\Models;
 use App\Traits\Uuids;
 use Illuminate\Database\Eloquent\Model;
 
-class Message extends Model
+class Message extends Model implements RelationNamesInterface
 {
     use Uuids;
 
@@ -29,7 +29,7 @@ class Message extends Model
      * @var array
      */
     protected $fillable = [
-        'subject', 'message'
+        'subject', 'message', 'sender'
     ];
 
     /**

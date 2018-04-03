@@ -4,8 +4,9 @@ namespace App\Resources;
 
 use Illuminate\Http\Resources\Json\Resource;
 
-class JsonApiIdentifierResource extends Resource implements JsonApiInterface
+class JsonApiIdentifierResource extends Resource
 {
+    use JsonApiTrait;
     /**
      * Transform the resource into an array.
      *
@@ -14,26 +15,12 @@ class JsonApiIdentifierResource extends Resource implements JsonApiInterface
      * @return array
      */
     public function toArray($request)
-
     {
+        $model = $this->resource;
+
         return [
-            'type' => $this->getType(),
-            'id'   => $this->getId(),
+            'type' => $this->getTypeFrom($model),
+            'id'   => $this->getIdFrom($model),
         ];
-    }
-
-    public function getId()
-    {
-        return $this->resource->getKey();
-    }
-
-    public function getType()
-    {
-        return strtolower(class_basename(get_class($this->resource)));
-    }
-
-    public function getLinks()
-    {
-        return null;
     }
 }

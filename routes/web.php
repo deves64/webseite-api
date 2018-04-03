@@ -27,39 +27,39 @@ $router->get('message/{id}', [
 ]);
 
 $router->get('message/{id}/relationships/sender', [
-    'as' => 'messageSenderRelationship.show', 'uses' => 'MessageRelationshipController@showSender'
+    'as' => 'messageSenderRelationship.show', 'uses' => 'MessageSenderRelationshipController@show'
 ]);
 
 $router->patch('message/{id}/relationships/sender', [
-    'as' => 'messageSenderRelationship.update', 'uses' => 'MessageRelationshipController@updateSender'
+    'as' => 'messageSenderRelationship.update', 'uses' => 'MessageSenderRelationshipController@update'
 ]);
 
 $router->get('message/{id}/sender', [
-    'as' => 'messageSenderChild.show', 'uses' => 'MessageRelationshipController@show'
+    'as' => 'messageSenderChild.show', 'uses' => 'MessageSenderRelationshipController@show'
 ]);
 
 $router->get('message/{id}/relationships/receiver', [
-    'as' => 'messageReceiverRelationship.show', 'uses' => 'MessageRelationshipController@receiver'
+    'as' => 'messageReceiverRelationship.show', 'uses' => 'MessageSenderRelationshipController@receiver'
 ]);
 
 $router->get('message/{id}/receiver', [
-    'as' => 'messageReceiverChild.show', 'uses' => 'MessageRelationshipController@show'
+    'as' => 'messageReceiverChild.show', 'uses' => 'MessageSenderRelationshipController@show'
 ]);
 
 $router->get('message/{id}/relationships/sender-client', [
-    'as' => 'messageSenderClientRelationship.show', 'uses' => 'MessageRelationshipController@show'
+    'as' => 'messageSenderClientRelationship.show', 'uses' => 'MessageSenderRelationshipController@show'
 ]);
 
 $router->get('message/{id}/sender-client', [
-    'as' => 'messageSenderClientChild.show', 'uses' => 'MessageRelationshipController@show'
+    'as' => 'messageSenderClientChild.show', 'uses' => 'MessageSenderRelationshipController@show'
 ]);
 
 $router->get('message/{id}/relationships/receiver-client', [
-    'as' => 'messageReceiverClientRelationship.show', 'uses' => 'MessageRelationshipController@show'
+    'as' => 'messageReceiverClientRelationship.show', 'uses' => 'MessageSenderRelationshipController@show'
 ]);
 
 $router->get('message/{id}/receiver-client', [
-    'as' => 'messageReceiverClientChild.show', 'uses' => 'MessageRelationshipController@show'
+    'as' => 'messageReceiverClientChild.show', 'uses' => 'MessageSenderRelationshipController@show'
 ]);
 
 
