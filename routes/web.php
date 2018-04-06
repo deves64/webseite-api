@@ -63,11 +63,11 @@ $router->get('message/{id}/receiver-client', [
 ]);
 
 
-$router->post('contact', 'ContactController@store');
-$router->get('contact', 'ContactController@index');
+$router->post('contact', 'PersonController@store');
+$router->get('contact', 'PersonController@index');
 
 $router->get('contact/{id}', [
-    'as' => 'contact.show', 'uses' => 'ContactController@show'
+    'as' => 'contact.show', 'uses' => 'PersonController@show'
 ]);
 
 $router->get('contact/{id}/relationships/message', [

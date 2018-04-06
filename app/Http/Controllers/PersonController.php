@@ -7,7 +7,7 @@ use App\Resources\JsonApiCollection;
 use App\Resources\JsonApiResource;
 use Illuminate\Http\Request;
 
-class ContactController extends Controller
+class PersonController extends Controller
 {
     /**
      * Display a listing of the resource.
